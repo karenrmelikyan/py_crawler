@@ -1,11 +1,8 @@
-import time
 import random
 import aiohttp
 import asyncio
-import requests
 import platform
 from fake_useragent import UserAgent
-from aiohttp_proxy import ProxyConnector, ProxyType
 
 
 # for avoiding characteristic bugs in Windows
@@ -22,47 +19,20 @@ def run(urls, scraper):
 
 async def launch(urls, scraper):
     data = []
-    proxy_list = get_proxy_list()
-    if proxy_list:
-        for chunk_urls in chunks(urls, 99):
-            # run x(0)..x(10) concurrently and process results as they arrive
-            for function in asyncio.as_completed([get_content(url, proxy_list) for url in chunk_urls]):
-                html = await function
-                # scrap data
-                data.append(scraper(html))
+    for chunk_urls in chunks(urls, 99):
+        for function in asyncio.as_completed([get_content(url) for url in chunk_urls]):
+            # get page content
+            html = await function
+            # scrap data
+            data.append(scraper(html))
 
     return data
 
 
-async def get_content(url, proxy_list) -> str:
-    for proxy in proxy_list:
-        connector = ProxyConnector.from_url('socks4://' + proxy)
-        try:
-            async with aiohttp.ClientSession(connector=connector, headers=get_headers()) as session:
-                async with session.get(url) as response:
-                    return await response.text()
-        except Exception as e:
-            continue
-
-
-def get_proxy_list() -> list:
-    status_code = 0
-    response = None
-
-    while status_code != 200:
-        # get socks4 proxies
-        response = requests.get('https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks4&timeout=10000'
-                                '&country=all&ssl=all&anonymity=all', headers=get_headers())
-        status_code = response.status_code
-        time.sleep(random.randrange(2, 4))
-
-    # get proxy list from response
-    socks4_proxy_list = response.text.split("\r\n")
-
-    # remove last empty element
-    socks4_proxy_list.pop(len(socks4_proxy_list) - 1)
-
-    return socks4_proxy_list
+async def get_content(url) -> str:
+    async with aiohttp.ClientSession(headers=get_headers()) as session:
+        async with session.get(url) as response:
+            return await response.text()
 
 
 def get_headers() -> dict:
