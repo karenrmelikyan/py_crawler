@@ -30,6 +30,7 @@ async def launch(urls, scraper):
 
 
 async def get_content(url) -> str:
+    print(url)
     async with aiohttp.ClientSession(headers=get_headers()) as session:
         async with session.get(url) as response:
             return await response.text()

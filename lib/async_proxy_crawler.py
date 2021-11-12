@@ -35,26 +35,40 @@ async def launch(urls, scraper):
 
 
 async def get_content(url, proxy_list) -> str:
+    print(url)
+    proxy_counter = len(proxy_list)
     for proxy in proxy_list:
+        proxy_counter -= 1
         connector = ProxyConnector.from_url('socks4://' + proxy)
         try:
-            async with aiohttp.ClientSession(connector=connector, headers=get_headers()) as session:
-                async with session.get(url) as response:
-                    return await response.text()
+            async with aiohttp.ClientTimeout(total=None, sock_connect=6, sock_read=6):
+                async with aiohttp.ClientSession(connector=connector, headers=get_headers()) as session:
+                    async with session.get(url, allow_redirects=False, timeout=5) as response:
+                        # if was been reached end of proxy list
+                        if proxy_counter <= 1:
+                            raise ReachProxyListLimit(f'Exception!!! Reach of proxy list limit for url {url}')
+
+                        return await response.text()
+
         except Exception as e:
             continue
 
 
 def get_proxy_list() -> list:
     status_code = 0
+    attempts = 0
     response = None
 
-    while status_code != 200:
+    while status_code != 200 and attempts < 10:
+        attempts += 1
         # get socks4 proxies
         response = requests.get('https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks4&timeout=10000'
                                 '&country=all&ssl=all&anonymity=all', headers=get_headers())
         status_code = response.status_code
         time.sleep(random.randrange(2, 4))
+
+    if attempts >= 9:
+        raise NotReceivedProxiesException('EXCEPTION!!! Was not received proxy list')
 
     # get proxy list from response
     socks4_proxy_list = response.text.split("\r\n")
@@ -100,3 +114,11 @@ def get_headers() -> dict:
 def chunks(lst, n=99):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
+
+
+class NotReceivedProxiesException(Exception):
+    pass
+
+
+class ReachProxyListLimit(Exception):
+    pass
