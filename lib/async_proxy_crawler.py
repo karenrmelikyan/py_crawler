@@ -5,7 +5,7 @@ import asyncio
 import requests
 import platform
 from fake_useragent import UserAgent
-from aiohttp_proxy import ProxyConnector, ProxyType
+from aiohttp_proxy import ProxyConnector
 
 
 # for avoiding characteristic bugs in Windows

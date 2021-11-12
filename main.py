@@ -1,102 +1,15 @@
-from lib import async_proxy_crawler, async_crawler
-
-
-def scraper(html):
-    return 'ok'
-
+from lib import async_crawler, async_proxy_crawler, all_urls_scraper
 
 if __name__ == '__main__':
-    res_list = async_proxy_crawler.run([
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-        'https://www.w3schools.com/python/python_tuples.asp',
-        'https://www.w3schools.com/python/python_intro.asp',
-        'https://www.w3schools.com/python/python_getstarted.asp',
-        'https://www.w3schools.com/python/python_syntax.asp',
-        'https://www.w3schools.com/python/python_comments.asp',
-        'https://www.w3schools.com/python/python_variables.asp',
-    ], scraper)
+    pass
+    # all_urls_scraper.run('https://bookmark.am', '/product/')
 
-    print(res_list)
+
+
+
+
+
+
+
+
+

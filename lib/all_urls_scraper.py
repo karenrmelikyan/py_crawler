@@ -1,59 +1,68 @@
 from bs4 import BeautifulSoup
 from lib import async_crawler, useful
+from urllib import parse
 
 
-def run(start_url, urls_param) -> None:
-    async_crawler.run([start_url], scraper, domain=useful.get_domain(start_url), param=urls_param)
+def run(start_url, required) -> None:
+    # extract and save domain name & protocol
+    domain = useful.get_domain(start_url)
+    protocol = useful.get_protocol(start_url)
+
+    # first request by first URL
+    urls = async_crawler.run([start_url], get_all_urls)[0]
+    # save first url
+    visited = [start_url]
+    # filter
+    filtered = get_filtered_urls(urls, domain, protocol)
+    # first bulk request and get matrix of urls
+    urls_matrix = async_crawler.run(filtered, get_all_urls)
+    # save before next request
+    visited += list(map(lambda url: url, filtered))
+
+    while urls_matrix:
+        filtered = sum(urls_matrix, [])
+        filtered = get_filtered_urls(filtered, domain, protocol)
+        filtered = list(set(visited) ^ set(filtered))
+        urls_matrix = async_crawler.run(filtered, get_all_urls)
+        visited += list(map(lambda url: url, filtered))
+
+        # add to file required URLs
+        required_urls = list(filter(lambda x: required in x, filtered))
+        if required_urls:
+            with open('urls.txt', 'a') as file:
+                for url in required_urls:
+                    file.write(url + "\n")
 
 
-def scraper(html, **kwargs) -> bool:
-    all_urls = get_all_urls(html)
-    urls_sorting(all_urls, **kwargs)
+def get_filtered_urls(all_urls, domain, protocol) -> list:
+    def make_url_absolute(url) -> str:
+        return url if url.startswith('http') else protocol + '://' + domain + '/' + url
 
-    return True
+    def is_local_url(full_url, domain) -> bool:
+        result = parse.urlparse(full_url)
+        if result.scheme not in [protocol, '']:
+            return False
+        if result.netloc == domain or result.scheme == '':
+            return True
 
-
-# separating URLs for visit and save
-def urls_sorting(all_urls, **kwargs):
-    data = []
-    for obj in kwargs.items():
-        data.append(obj)
-    domain_name = data[0]
-    urls_param = data[1]
-
-    local_urls = []
+    return list(set(map(make_url_absolute, filter(lambda url: is_local_url(url, domain), all_urls))))
 
 
-# first of all sort all local URLs
-# for url in all_urls:
-#     domain_name = useful.get_domain(url)
-#     if domain_name == domain:
-#         local_urls.append(url)
-#     else:
-#         if not domain_name:
-#             local_urls.append(domain + url)
-#
-# print(local_urls)
-
-
-def get_no_visited(urls):
-    pass
-
-
-def unique_resorting(urls):
-    pass
-
-
-def save_urls(urls):
-    pass
-
-
-def get_all_urls(html):
+def get_all_urls(html) -> list:
     urls = []
-    soup = BeautifulSoup(html, 'html5lib')
-    soup_a = soup.find_all('a')
-    # urls.append(map(lambda a: a['href'], soup_a))
-    for a in soup_a:
-        urls.append(a['href'])
+    try:
+        soup = BeautifulSoup(html, 'html5lib')
+        soup_a = soup.find_all('a')
+
+        urls = list(set((map(lambda a: a.get('href'), soup_a))))
+
+    except Exception as e:
+        print('Error in get_all_urls')
+        print(e)
 
     return urls
+
+
+def print_list(elems_list):
+    for elem in elems_list:
+        print(elem)
