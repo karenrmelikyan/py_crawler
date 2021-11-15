@@ -23,19 +23,17 @@ def run(urls, scraper):
 async def launch(urls, scraper):
     data = []
     proxy_list = get_proxy_list()
-    if proxy_list:
-        for chunk_urls in chunks(urls, 99):
-            # run x(0)..x(10) concurrently and process results as they arrive
-            for function in asyncio.as_completed([get_content(url, proxy_list) for url in chunk_urls]):
-                html = await function
-                # scrap data
-                data.append(scraper(html))
+    for chunk_urls in chunks(urls, 100):
+        # run x(0)..x(10) concurrently and process results as they arrive
+        for function in asyncio.as_completed([get_content(url, proxy_list) for url in chunk_urls]):
+            html = await function
+            # scrap data
+            data.append(scraper(html))
 
     return data
 
 
 async def get_content(url, proxy_list) -> str:
-    print(url)
     proxy_counter = len(proxy_list)
     for proxy in proxy_list:
         proxy_counter -= 1
@@ -55,8 +53,8 @@ async def get_content(url, proxy_list) -> str:
 
 
 def get_proxy_list() -> list:
-    status_code = 0
     attempts = 0
+    status_code = 0
     response = None
 
     while status_code != 200 and attempts < 10:
@@ -111,7 +109,7 @@ def get_headers() -> dict:
     }
 
 
-def chunks(lst, n=99):
+def chunks(lst, n=100):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 

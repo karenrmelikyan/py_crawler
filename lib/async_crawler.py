@@ -19,7 +19,7 @@ def run(urls, scraper):
 
 async def launch(urls, scraper):
     data = []
-    for chunk_urls in chunks(urls, 99):
+    for chunk_urls in chunks(urls, 100):
         for function in asyncio.as_completed([get_content(url) for url in chunk_urls]):
             # get page content
             html = await function
@@ -30,7 +30,6 @@ async def launch(urls, scraper):
 
 
 async def get_content(url) -> str:
-    print(url)
     async with aiohttp.ClientSession(headers=get_headers()) as session:
         async with session.get(url) as response:
             return await response.text()
@@ -68,6 +67,6 @@ def get_headers() -> dict:
     }
 
 
-def chunks(lst, n=99):
+def chunks(lst, n=100):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
