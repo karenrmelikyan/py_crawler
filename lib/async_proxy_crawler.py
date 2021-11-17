@@ -4,7 +4,7 @@ import aiohttp
 import asyncio
 import requests
 import platform
-from fake_useragent import UserAgent
+from lib import async_crawler
 from aiohttp_proxy import ProxyConnector
 
 
@@ -23,7 +23,7 @@ def run(urls, scraper):
 async def launch(urls, scraper):
     data = []
     proxy_list = get_proxy_list()
-    for chunk_urls in chunks(urls, 100):
+    for chunk_urls in async_crawler.chunks(urls, 100):
         # run x(0)..x(10) concurrently and process results as they arrive
         for function in asyncio.as_completed([get_content(url, proxy_list) for url in chunk_urls]):
             html = await function
@@ -40,11 +40,11 @@ async def get_content(url, proxy_list) -> str:
         connector = ProxyConnector.from_url('socks4://' + proxy)
         try:
             async with aiohttp.ClientTimeout(total=None, sock_connect=6, sock_read=6):
-                async with aiohttp.ClientSession(connector=connector, headers=get_headers()) as session:
+                async with aiohttp.ClientSession(connector=connector, headers=async_crawler.get_headers()) as session:
                     async with session.get(url, allow_redirects=False, timeout=5) as response:
                         # if was been reached end of proxy list
                         if proxy_counter <= 1:
-                            raise ReachProxyListLimit(f'Exception!!! Reach of proxy list limit for url {url}')
+                            raise ReachProxyListLimit(f'Exception!!! Reach proxy list limit for url {url}')
 
                         return await response.text()
 
@@ -61,7 +61,7 @@ def get_proxy_list() -> list:
         attempts += 1
         # get socks4 proxies
         response = requests.get('https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks4&timeout=10000'
-                                '&country=all&ssl=all&anonymity=all', headers=get_headers())
+                                '&country=all&ssl=all&anonymity=all', headers=async_crawler.get_headers())
         status_code = response.status_code
         time.sleep(random.randrange(2, 4))
 
@@ -75,43 +75,6 @@ def get_proxy_list() -> list:
     socks4_proxy_list.pop(len(socks4_proxy_list) - 1)
 
     return socks4_proxy_list
-
-
-def get_headers() -> dict:
-    def get_rand_user_agent() -> str:
-        ua_dict = UserAgent().data
-        ua_list = ua_dict['browsers']['chrome']
-
-        return ua_list[random.randrange(0, len(ua_list) - 1)]
-
-    def get_rand_referer() -> str:
-        referers = [
-            'https://www.google.com',
-            'https://www.bing.com',
-            'https://www.facebook.com',
-            'https://www.google.com',
-            'https://yandex.com',
-            'https://www.yahoo.com',
-            'https://www.google.com',
-        ]
-
-        return referers[random.randrange(0, len(referers) - 1)]
-
-    return {
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,"
-                  "application/signed-exchange;v=b3;q=0.9",
-        "Accept-Encoding": "gzip, deflate",
-        "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
-        "Dnt": "1",
-        "Referer": get_rand_referer(),
-        "Upgrade-Insecure-Requests": "1",
-        "User-Agent": get_rand_user_agent(),
-    }
-
-
-def chunks(lst, n=100):
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
 
 
 class NotReceivedProxiesException(Exception):

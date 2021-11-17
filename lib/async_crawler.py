@@ -67,6 +67,6 @@ def get_headers() -> dict:
     }
 
 
-def chunks(lst, n=100):
+def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]

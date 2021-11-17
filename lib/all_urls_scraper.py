@@ -33,6 +33,7 @@ def run(start_url, required) -> None:
                 for url in required_urls:
                     file.write(url + "\n")
 
+
 def proxy_run(start_url, required) -> None:
     # extract and save domain name & protocol
     domain = useful.get_domain(start_url)
@@ -62,7 +63,6 @@ def proxy_run(start_url, required) -> None:
             with open('urls.txt', 'a') as file:
                 for url in required_urls:
                     file.write(url + "\n")
-
 
 
 def get_filtered_urls(all_urls, domain, protocol) -> list:
