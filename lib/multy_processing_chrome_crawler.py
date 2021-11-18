@@ -25,8 +25,3 @@ def launch_processes(chunk_urls, browser_manager):
 def process(url, browser_manager):
     # invoke callback
     browser_manager(url, helium)
-
-
-def chunks(lst, n=10):
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]

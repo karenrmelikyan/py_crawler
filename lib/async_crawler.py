@@ -19,7 +19,7 @@ def run(urls, scraper):
 
 async def launch(urls, scraper):
     data = []
-    for chunk_urls in chunks(urls, 100):
+    for chunk_urls in chunks(urls, 99):
         for function in asyncio.as_completed([get_content(url) for url in chunk_urls]):
             # get page content
             html = await function
