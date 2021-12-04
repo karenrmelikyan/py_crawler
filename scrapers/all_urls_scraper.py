@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
-from crawlers import async_crawler, useful, async_proxy_crawler
+from crawlers import async_crawler, async_proxy_crawler
+import useful
 from urllib import parse
 
 

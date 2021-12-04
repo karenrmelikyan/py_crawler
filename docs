@@ -1,10 +1,7 @@
-__ Compile __
-
-https://datatofish.com/executable-pyinstaller/
-
 __ GUI __
 
 https://pysimplegui.readthedocs.io/en/latest/#install
+https://pysimplegui.trinket.io/demo-programs#/demo-programs/the-basic-pysimplegui-program
 
 __ Helium __
 
@@ -12,7 +9,12 @@ https://selenium-python-helium.readthedocs.io/en/latest/
 
 __ Beautiful Soup __
 
+https://beautiful-soup-4.readthedocs.io/en/latest/#
 https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 
+__ Compiler __
+
+https://www.pyinstaller.org/
+https://datatofish.com/executable-pyinstaller/
 
 

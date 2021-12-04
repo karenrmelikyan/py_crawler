@@ -21,30 +21,36 @@ def run(urls, scraper):
 
 
 async def launch(urls, scraper):
-    data = []
     proxy_list = get_proxy_list()
-    for chunk_urls in async_crawler.chunks(urls, 99):
+    for chunk_urls in async_crawler.chunks(urls, 100):
         # run x(0)..x(10) concurrently and process results as they arrive
         for function in asyncio.as_completed([get_content(url, proxy_list) for url in chunk_urls]):
             html = await function
-            # scrap data
-            data.append(scraper(html))
-
-    return data
+            # launch callback
+            scraper(html)
 
 
 async def get_content(url, proxy_list) -> str:
-    proxy_counter = len(proxy_list)
-    for proxy in proxy_list:
-        proxy_counter -= 1
+    while True:
+        # get current proxy_list length
+        proxy_list_len = len(proxy_list) - 1
+
+        # if reached proxy_list limit
+        if proxy_list_len == 0:
+            raise ReachProxyListLimit
+
+        # get proxy randomly from a list
+        proxy = proxy_list[random.randrange(proxy_list_len)]
+
         connector = ProxyConnector.from_url('socks4://' + proxy)
         session_timeout = aiohttp.ClientTimeout(total=None, sock_connect=6, sock_read=6)
         try:
             async with aiohttp.ClientSession(timeout=session_timeout, connector=connector, headers=async_crawler.get_headers()) as session:
                 async with session.get(url, allow_redirects=False, timeout=5) as response:
-                    # if was been reached end of proxy list
-                    if proxy_counter <= 1:
-                        raise ReachProxyListLimit(f'Exception!!! Reach proxy list limit for url {url}')
+
+                    if response.status != 200:
+                        proxy_list.remove(proxy)
+                        continue
 
                     return await response.text()
 
